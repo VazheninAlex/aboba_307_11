@@ -3,11 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
-struct Heap {
- private:
-  std::vector<std::pair<long long, long long>> values_;
-  std::unordered_map<long long, long long> decrease_;
-
+class Heap {
  public:
   long long GetMin() { return values_[0].first; }
   void Insert(long long val, long long index) {
@@ -62,6 +58,10 @@ struct Heap {
       return;
     }
   }
+  
+ private:
+  std::vector<std::pair<long long, long long>> values_;
+  std::unordered_map<long long, long long> decrease_;
 };
 
 int main() {
@@ -73,19 +73,19 @@ int main() {
   Heap heap;
   for (long long i = 0; i <= qual; ++i) {
     std::getline(std::cin, input);
-    if (input[0] == 'i') {
+    if (input.find("insert") == 0) {
       std::string index;
-      for (long long j = (1 << 3) - 1; j < static_cast<long long>(input.size());
+      for (long long j = 7; j < static_cast<long long>(input.size());
            ++j) {
         index += input[j];
       }
       heap.Insert(std::stoi(index), i);
     }
-    if (input[0] == 'd') {
+    if (input.find("decreaseKey") == 0) {
       std::string index;
       std::string delta;
       long long jum;
-      for (jum = (1 << 4) - 4;
+      for (jum = 12;
            jum < static_cast<long long>(input.find(" ", (1 << 4) - 3)); ++jum) {
         index += input[jum];
       }
@@ -94,10 +94,10 @@ int main() {
       }
       heap.DecreaseKey(std::stoi(index), std::stoi(delta));
     }
-    if (input[0] == 'g') {
+    if (input == "getMin") {
       std::cout << heap.GetMin() << "\n";
     }
-    if (input[0] == 'e') {
+    if (input == "extractMin") {
       heap.ExtractMin();
     }
   }

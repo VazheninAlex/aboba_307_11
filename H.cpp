@@ -3,13 +3,9 @@
 #include <unordered_map>
 #include <vector>
 
-#define magic 30
+const int magic = 30;
 
-struct Heap {
- private:
-  std::vector<std::pair<long long, long long>> values_;
-  std::unordered_map<long long, long long> decrease_;
-
+class Heap {
  public:
   std::pair<long long, long long> GetMin() { return values_[0]; }
   long long Size() { return values_.size(); }
@@ -69,21 +65,21 @@ struct Heap {
       return;
     }
   }
+  
+ private:
+  std::vector<std::pair<long long, long long>> values_;
+  std::unordered_map<long long, long long> decrease_;
 };
 
-struct DoubleHeap {
- private:
-  Heap max_;
-  Heap min_;
-
+class DoubleHeap {
  public:
-  void Iinsert(long long val, long long index) {
+  void Insert(long long val, long long index) {
     min_.Insert(val, index);
     max_.Insert(val * (-1), index);
     std::cout << "ok"
               << "\n";
   }
-  void GgetMin() {
+  void GetMin() {
     if (min_.Size() == 0) {
       std::cout << "error"
                 << "\n";
@@ -91,7 +87,7 @@ struct DoubleHeap {
     }
     std::cout << min_.GetMin().first << "\n";
   }
-  void GgetMax() {
+  void GetMax() {
     if (min_.Size() == 0) {
       std::cout << "error"
                 << "\n";
@@ -99,14 +95,14 @@ struct DoubleHeap {
     }
     std::cout << (-1) * max_.GetMin().first << "\n";
   }
-  void Cclear() {
+  void Clear() {
     max_.Clear();
     min_.Clear();
     std::cout << "ok"
               << "\n";
   }
-  void Ssize() { std::cout << max_.Size() << "\n"; }
-  void EextractMin() {
+  void Size() { std::cout << max_.Size() << "\n"; }
+  void ExtractMin() {
     if (min_.Size() == 0) {
       std::cout << "error"
                 << "\n";
@@ -118,7 +114,7 @@ struct DoubleHeap {
     max_.DecreaseKey(min.second, (1 << magic));
     max_.ExtractMin();
   }
-  void EextractMax() {
+  void ExtractMax() {
     if (min_.Size() == 0) {
       std::cout << "error"
                 << "\n";
@@ -130,6 +126,10 @@ struct DoubleHeap {
     min_.DecreaseKey(max.second, (1 << magic));
     min_.ExtractMin();
   }
+  
+ private:
+  Heap max_;
+  Heap min_;
 };
 
 int main() {
@@ -141,31 +141,31 @@ int main() {
   DoubleHeap heap;
   for (long long i = 0; i <= qual; ++i) {
     std::getline(std::cin, input);
-    if (input[0] == 'i') {
+    if (input.find("insert") == 0) {
       std::string index;
-      for (long long j = (1 << 3) - 1; j < static_cast<long long>(input.size());
+      for (long long j = 7; j < static_cast<long long>(input.size());
            ++j) {
         index += input[j];
       }
-      heap.Iinsert(std::stoi(index), i);
+      heap.Insert(std::stoi(index), i);
     }
-    if (input[0] == 's') {
-      heap.Ssize();
+    if (input == "size") {
+      heap.Size();
     }
-    if (input[0] == 'c') {
-      heap.Cclear();
+    if (input == "clear") {
+      heap.Clear();
     }
     if (input == "get_max") {
-      heap.GgetMax();
+      heap.GetMax();
     }
     if (input == "get_min") {
-      heap.GgetMin();
+      heap.GetMin();
     }
     if (input == "extract_max") {
-      heap.EextractMax();
+      heap.ExtractMax();
     }
     if (input == "extract_min") {
-      heap.EextractMin();
+      heap.ExtractMin();
     }
   }
 }
