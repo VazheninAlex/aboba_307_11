@@ -6,18 +6,15 @@
 
 struct Node {
  public:
-  std::string value;
-  std::string key;
+  int value;
   int depth;
   int dif;
   Node* left_son;
   Node* right_son;
   Node* parent;
 
-  Node(std::string val, std::string ke, int dep, int di, Node* left,
-       Node* right, Node* par)
+  Node(int val, int dep, int di, Node* left, Node* right, Node* par)
       : value(val),
-        key(ke),
         depth(dep),
         dif(di),
         left_son(left),
@@ -79,20 +76,27 @@ void RotateLeft(Node* left, Node* right) {
   Update(right);
 }
 
-std::string Find(Node* root, std::string num) {
-  if (root == nullptr) {
-    return "Errrrrror";
-  }
+int Find(Node* root, int num, int ans) {
   if (num == root->value) {
-    return root->key;
+    return num;
   }
   if (num > root->value) {
-    return Find(root->right_son, num);
+    if (root->right_son == nullptr) {
+      if (ans == magic) {
+        return -1;
+      }
+      return ans;
+    }
+    return Find(root->right_son, num, ans);
   }
   if (num < root->value) {
-    return Find(root->left_son, num);
+    ans = std::min(ans, root->value);
+    if (root->left_son == nullptr) {
+      return ans;
+    }
+    return Find(root->left_son, num, ans);
   }
-  return "Errrrrror";
+  return -1;
 }
 
 Node* Stabilization(Node* temp) {
@@ -125,16 +129,28 @@ Node* Stabilization(Node* temp) {
   return temp;
 }
 
-Node* Insert(Node* root, std::pair<std::string, std::string> num) {
+Node* Check(Node* root) {
+  Node* tmp = root;
+  while (tmp->parent != nullptr) {
+    tmp = tmp->parent;
+  }
+  return tmp;
+}
+
+Node* Insert(Node* root, int num) {
   if (root == nullptr) {
-    Node* temp =
-        new Node(num.first, num.second, 1, 0, nullptr, nullptr, nullptr);
+    Node* temp = new Node(num, 1, 0, nullptr, nullptr, nullptr);
     return temp;
   }
-  if (num.first > root->value) {
+  if (num == root->value) {
+    return Check(root);
+  }
+  if (num > root->value) {
     if (root->right_son == nullptr) {
-      Node* temp =
-          new Node(num.first, num.second, 1, 0, nullptr, nullptr, root);
+      if (num == root->value) {
+        return Check(root);
+      }
+      Node* temp = new Node(num, 1, 0, nullptr, nullptr, root);
       root->right_son = temp;
       Node* tmp = temp;
       while (tmp->parent != nullptr) {
@@ -146,10 +162,12 @@ Node* Insert(Node* root, std::pair<std::string, std::string> num) {
     }
     return Insert(root->right_son, num);
   }
-  if (num.first < root->value) {
+  if (num < root->value) {
     if (root->left_son == nullptr) {
-      Node* temp =
-          new Node(num.first, num.second, 1, 0, nullptr, nullptr, root);
+      if (num == root->value) {
+        return Check(root);
+      }
+      Node* temp = new Node(num, 1, 0, nullptr, nullptr, root);
       root->left_son = temp;
       Node* tmp = temp;
       while (tmp->parent != nullptr) {
@@ -174,31 +192,41 @@ void Clear(Node* root) {
 }
 
 int main() {
-  std::ios::sync_with_stdio(false);
   std::cin.tie(0);
   std::cout.tie(0);
   int kum;
   std::cin >> kum;
-  std::string input1;
-  std::string input2;
-  Node* root1 = nullptr;
-  Node* root2 = nullptr;
-  for (int i = 0; i < kum; ++i) {
-    std::cin >> input1 >> input2;
-    root1 = Insert(root1, std::make_pair(input1, input2));
-    root2 = Insert(root2, std::make_pair(input2, input1));
-  }
-  int qum;
-  std::cin >> qum;
-  for (int i = 0; i < qum; ++i) {
-    std::cin >> input1;
-    if (Find(root1, input1) == "Errrrrror") {
-      std::cout << Find(root2, input1) << "\n";
-    } else {
-      std::cout << Find(root1, input1) << "\n";
+  std::string input;
+  Node* root = nullptr;
+  bool flag = true;
+  int val;
+  std::string xxx;
+  for (int i = 0; i <= kum; ++i) {
+    xxx = "";
+    getline(std::cin, input);
+    if (input[0] == '+') {
+      if (flag) {
+        for (size_t j = 2; j < input.size(); ++j) {
+          xxx += input[j];
+        }
+        root = Insert(root, std::stoi(xxx));
+      } else {
+        for (size_t j = 2; j < input.size(); ++j) {
+          xxx += input[j];
+        }
+        root = Insert(root, ((std::stoi(xxx) + val) % (magic / 2)));
+        flag = true;
+      }
+    }
+    if (input[0] == '?') {
+      for (size_t j = 2; j < input.size(); ++j) {
+        xxx += input[j];
+      }
+      val = Find(root, std::stoi(xxx), magic);
+      std::cout << val << "\n";
+      flag = false;
     }
   }
-  Clear(root1);
-  Clear(root2);
+  Clear(root);
   return 0;
 }
