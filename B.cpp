@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-#define magic 2000000000
+const int kLimit = 2000000000;
 
 struct Node {
  public:
@@ -22,7 +22,11 @@ struct Node {
         parent(par) {}
 };
 
-void Update(Node* temp) {
+class Tree {
+ public:
+  Node* root = nullptr;
+  
+  void Update(Node* temp) {
   if (temp->left_son == nullptr && temp->right_son == nullptr) {
     temp->depth = 1;
     temp->dif = 0;
@@ -82,7 +86,7 @@ int Find(Node* root, int num, int ans) {
   }
   if (num > root->value) {
     if (root->right_son == nullptr) {
-      if (ans == magic) {
+      if (ans == kLimit) {
         return -1;
       }
       return ans;
@@ -190,43 +194,46 @@ void Clear(Node* root) {
   Clear(root->right_son);
   delete root;
 }
+};
+
 
 int main() {
   std::cin.tie(0);
   std::cout.tie(0);
-  int kum;
-  std::cin >> kum;
+  int number;
+  std::cin >> number;
   std::string input;
+  Tree tree;
   Node* root = nullptr;
   bool flag = true;
   int val;
-  std::string xxx;
-  for (int i = 0; i <= kum; ++i) {
-    xxx = "";
+  std::string inputValue;
+  for (int i = 0; i <= number; ++i) {
+    inputValue = "";
     getline(std::cin, input);
     if (input[0] == '+') {
       if (flag) {
         for (size_t j = 2; j < input.size(); ++j) {
-          xxx += input[j];
+          inputValue += input[j];
         }
-        root = Insert(root, std::stoi(xxx));
+        root = tree.Insert(root, std::stoi(inputValue));
       } else {
         for (size_t j = 2; j < input.size(); ++j) {
-          xxx += input[j];
+          inputValue += input[j];
         }
-        root = Insert(root, ((std::stoi(xxx) + val) % (magic / 2)));
+        root = tree.Insert(root, ((std::stoi(inputValue) + val) % (kLimit / 2)));
         flag = true;
       }
     }
     if (input[0] == '?') {
       for (size_t j = 2; j < input.size(); ++j) {
-        xxx += input[j];
+        inputValue += input[j];
       }
-      val = Find(root, std::stoi(xxx), magic);
+      val = tree.Find(root, std::stoi(inputValue), kLimit);
       std::cout << val << "\n";
       flag = false;
     }
   }
-  Clear(root);
+  tree.Clear(root);
   return 0;
 }
